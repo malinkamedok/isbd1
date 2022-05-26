@@ -1,4 +1,9 @@
-drop table if exists direction, color, light, locations, objects, speed, dirspeed, lightcolor cascade;
+drop table if exists direction, color, light, objects, speed, dirspeed, lightcolor, observer, observe_history cascade;
+drop type if exists nation cascade ;
+
+create type nation as enum (
+    'русский', 'армян', 'ромчи'
+    );
 
 CREATE TABLE light (
 
@@ -86,17 +91,6 @@ CREATE TABLE dirspeed (
         ON UPDATE CASCADE
 );
 
-CREATE TABLE locations (
-
-       id serial NOT NULL,
-
-       name varchar(30) NOT NULL,
-
-       part varchar(30) NOT NULL,
-
-       PRIMARY KEY (id)
-);
-
 CREATE TABLE objects (
 
     id serial NOT NULL,
@@ -111,8 +105,6 @@ CREATE TABLE objects (
 
     speedID serial,
 
-    locationID serial,
-
     PRIMARY KEY (id),
 
     FOREIGN KEY ( colorID ) REFERENCES color ( id )
@@ -123,37 +115,37 @@ CREATE TABLE objects (
     FOREIGN KEY ( speedID ) REFERENCES speed ( id )
 
         ON DELETE CASCADE
-        ON UPDATE CASCADE,
-
-    FOREIGN KEY ( locationID ) REFERENCES locations ( id )
-
-        ON DELETE CASCADE
         ON UPDATE CASCADE
 );
 
 CREATE TABLE daytime (
 
-    id serial NOT NULL,
+    id serial PRIMARY KEY,
 
-    time varchar(30)  NOT NULL CHECK (time IN ('morning', 'day', 'evening', 'night')),
-
-    PRIMARY KEY (id)
+    time varchar(30)  NOT NULL CHECK (time IN ('morning', 'day', 'evening', 'night'))
 );
 
-CREATE TABLE observer (
+-- CREATE TABLE observer (
+--
+--     id serial PRIMARY KEY,
+--
+--     name varchar(30) UNIQUE,
+--
+--     visibility int CHECK( visibility >= 0 AND visibility <= 100 )
+-- );
 
-    id   serial NOT NULL,
 
-    name varchar(30) UNIQUE,
+create table observer (
+    id bigserial primary key,
+    name varchar(30) not null ,
+    age int not null  check ( age > 0 ),
+    nationality nation not null
+);
 
-    visibility int CHECK( visibility >= 0 AND visibility <= 100 ),
-
-    objectID serial,
-
-    FOREIGN KEY ( objectID ) REFERENCES objects ( id )
-
-        ON DELETE CASCADE
-        ON UPDATE CASCADE,
-
-    PRIMARY KEY (id)
+create table observe_history (
+    id bigserial primary key ,
+    observer_id bigint references observer(id),
+    object_id bigint references objects(id),
+    start_time timestamp not null,
+    end_time timestamp
 );
