@@ -125,16 +125,6 @@ CREATE TABLE daytime (
     time varchar(30)  NOT NULL CHECK (time IN ('morning', 'day', 'evening', 'night'))
 );
 
--- CREATE TABLE observer (
---
---     id serial PRIMARY KEY,
---
---     name varchar(30) UNIQUE,
---
---     visibility int CHECK( visibility >= 0 AND visibility <= 100 )
--- );
-
-
 create table observer (
     id bigserial primary key,
     name varchar(30) not null ,
